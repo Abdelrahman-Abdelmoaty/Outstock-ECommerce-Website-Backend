@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'google/login'], function () {
+    Route::get('url', [GoogleController::class, 'getAuthUrl']);
+    Route::post('', [GoogleController::class, 'postLogin']);
+});
+
+Route::middleware(['auth:api'])->group(function () {
+    // Here will be authorized routes
 });
