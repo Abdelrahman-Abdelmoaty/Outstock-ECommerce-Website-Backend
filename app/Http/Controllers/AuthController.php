@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\AuthForgotPasswordRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -16,7 +22,7 @@ class AuthController extends Controller
         $request['password'] = Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
         $user = User::create($request->toArray());
-        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+        $token = $user->createToken('Laravel Password Grant Client')->plainTextToken;
         $response = ['token' => $token];
         return response($response, 200);
     }
@@ -31,7 +37,7 @@ class AuthController extends Controller
 
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $token = $user->createToken('Password Grant Client')->plainTextToken;
                 $response = ['token' => $token];
                 return response($response, 200);
             }
@@ -47,5 +53,42 @@ class AuthController extends Controller
         $token->revoke();
         $response = ['message' => 'You have been successfully logged out!'];
         return response($response, 200);
+    }
+
+    public function forgot_password(ForgotPasswordRequest $request)
+    {
+        try {
+            $response = Password::sendResetLink($request->only('email'));
+            switch ($response) {
+                case Password::RESET_LINK_SENT:
+                    return response()->json(["message" => trans($response)]);
+                case Password::INVALID_USER:
+                    return response()->json(["message" => trans($response)], 400);
+            }
+        } catch (Exception $ex) {
+            $arr = array("status" => 400, "message" => $ex->getMessage(), "data" => []);
+            return response()->json(['message' => $arr['message']], $arr['status']);
+        }
+        return response()->json();
+    }
+
+    public function change_password(Request $request)
+    {
+        $input = $request->all();
+        $userid = $request->user()->id;
+        try {
+            if ((Hash::check(request('old_password'), Auth::user()->password)) == false) {
+                $arr = array("status" => 400, "message" => "Check your old password.", "data" => array());
+            } else if ((Hash::check(request('new_password'), Auth::user()->password)) == true) {
+                $arr = array("status" => 400, "message" => "Please enter a new password", "data" => array());
+            } else {
+                User::where('id', $userid)->update(['password' => Hash::make($input['new_password'])]);
+                $arr = array("status" => 200, "message" => "Password updated successfully.", "data" => array());
+            }
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            $arr = array("status" => 400, "message" => $msg, "data" => array());
+        }
+        return response()->json($arr);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
+use Google\Service\Connectors\AuthConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +17,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::group(['middleware' => 'json.response'], function () {
+    Route::get('', function () {
+        return '';
+    })->name('password.reset');
 
     Route::group(['prefix' => 'google/login'], function () {
         Route::get('url', [GoogleController::class, 'getAuthUrl']);
@@ -27,9 +32,8 @@ Route::group(['middleware' => 'json.response'], function () {
         Route::post('login', [AuthController::class, 'login'])->name('login');
         Route::post('register', [AuthController::class, 'register'])->name('register');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    });
-
-    Route::middleware(['auth:api'])->group(function () {
-        // Here will be authorized routes
+        Route::post('forgot-password', [AuthController::class, 'forgot_password']);
+        Route::post('change-password', [AuthController::class, 'change_password'])
+            ->middleware('auth:sanctum');
     });
 });

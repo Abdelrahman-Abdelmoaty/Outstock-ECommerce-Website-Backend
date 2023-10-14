@@ -135,7 +135,7 @@ class GoogleController extends Controller
          * Log in and return token
          * HTTP 201
          */
-        $token = $user->createToken("Google")->accessToken;
+        $token = $user->createToken("Google")->plainTextToken;
         return response()->json($token, 201);
     } // postLogin
 
