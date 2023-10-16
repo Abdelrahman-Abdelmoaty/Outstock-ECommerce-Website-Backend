@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\ProductController;
 use Google\Service\Connectors\AuthConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,8 @@ Route::group(['middleware' => 'json.response'], function () {
         Route::get('url', [GoogleController::class, 'getAuthUrl']);
         Route::post('', [GoogleController::class, 'postLogin']);
     });
+
+    Route::apiResource('products', ProductController::class)->only('index', 'show');
 
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', [AuthController::class, 'login'])->name('login');

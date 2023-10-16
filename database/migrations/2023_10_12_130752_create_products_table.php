@@ -17,6 +17,15 @@ return new class extends Migration
             $table->double('price');
             $table->integer('quantity');
             $table->double('rating')->max(5);
+
+            $table->unsignedBigInteger('category_id')->unsigned()->nullable();
+            $table->foreign('category_id')->references('id')
+                ->on('categories')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('color_id')->unsigned()->nullable();
+            $table->foreign('color_id')->references('id')
+                ->on('colors')->onUpdate('cascade')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
