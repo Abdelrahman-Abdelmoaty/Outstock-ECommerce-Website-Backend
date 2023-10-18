@@ -18,13 +18,12 @@ return new class extends Migration
             $table->boolean('isAdmin')->default(false);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('phone_number')->max(11)->min(11);
-            $table->dropColumn('provider_id');
-            $table->dropColumn('provider_name');
-            $table->dropColumn('google_access_token_json');
+            $table->string('provider_name')->nullable();
+            $table->string('provider_id')->nullable();
+            $table->text('google_access_token_json')->nullable();
 
-            $table->string('password')->nullable()->change();
 
             $table->rememberToken();
             $table->timestamps();
