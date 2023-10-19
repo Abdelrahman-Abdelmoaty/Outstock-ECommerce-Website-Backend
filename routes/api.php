@@ -29,7 +29,10 @@ Route::group(['middleware' => 'json.response'], function () {
         Route::post('', [GoogleController::class, 'postLogin']);
     });
 
-    Route::apiResource('products', ProductController::class)->only('index', 'show');
+    Route::apiResource('products', ProductController::class)->only('index', 'show', 'store');
+
+    // Will be moved to auth
+    Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
 
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', [AuthController::class, 'login'])->name('login');

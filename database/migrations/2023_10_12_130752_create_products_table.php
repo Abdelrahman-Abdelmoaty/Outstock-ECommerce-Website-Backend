@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->double('price');
-            $table->integer('quantity');
+            $table->integer('quantity')->min(0);
             $table->double('rating')->max(5);
 
             $table->unsignedBigInteger('category_id')->unsigned()->nullable();

@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Image;
 use App\Models\Product;
+use Illuminate\Support\Facades\File;
+
 
 class ProductController extends Controller
 {
@@ -14,23 +17,36 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::all());
+        return ProductResource::collection(Product::with('images')->get());
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Store a newly created Product in storage.
      */
     public function store(StoreProductRequest $request)
     {
-        //
+        $newProduct = new Product();
+        $newProduct->rating = 0;
+        $newProduct->name = $request->name;
+        $newProduct->price = $request->price;
+        $newProduct->quantity = $request->quantity;
+        $newProduct->color_id = $request->colorId;
+        $newProduct->category_id = $request->categoryId;
+        $newProduct->save();
+
+        $imagesList = [];
+        $i = 0;
+        foreach ($request->images as $image) {
+            $newImg = new Image();
+            $imageName = "$i" . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('products'), $imageName);
+            $newImg['image_url'] = $imageName;
+            $imagesList[] = $newImg;
+            $i++;
+        }
+
+        $newProduct->images()->saveMany($imagesList);
+        return new ProductResource(Product::with('images')->find($newProduct->id));
     }
 
     /**
@@ -38,7 +54,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return new ProductResource($product);
+        return new ProductResource(Product::with('images')->find($product->id));
     }
 
     /**
@@ -62,6 +78,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $productObj = Product::with('images')->find($product->id);
+        foreach ($productObj->images as $image) {
+            File::delete(public_path('products/') . $image->image_url);
+            $image->delete();
+        }
+
+        return $productObj->delete();
     }
 }
