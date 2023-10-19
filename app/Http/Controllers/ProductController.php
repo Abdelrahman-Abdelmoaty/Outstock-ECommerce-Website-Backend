@@ -46,7 +46,7 @@ class ProductController extends Controller
         }
 
         $newProduct->images()->saveMany($imagesList);
-        return new ProductResource(Product::with('images')->find($newProduct->id));
+        return new ProductResource(Product::with(['images', 'category', 'color'])->find($newProduct->id));
     }
 
     /**
@@ -54,7 +54,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return new ProductResource(Product::with('images')->find($product->id));
+        return new ProductResource(Product::with(['images', 'category', 'color'])->find($product->id));
     }
 
     /**

@@ -12,11 +12,8 @@ class ImageResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request)
     {
-        return [
-            'id' => $this->id,
-            'imageUrl' => isset($this->image_url) ? '/products/' . $this->image_url : null,
-        ];
+        return isset($this->image_url) ? '/products/' . $this->image_url : null;
     }
 }

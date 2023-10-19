@@ -19,27 +19,25 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::group(['middleware' => 'json.response'], function () {
-    Route::get('', function () {
-        return '';
-    })->name('password.reset');
+Route::get('', function () {
+    return '';
+})->name('password.reset');
 
-    Route::group(['prefix' => 'google/login'], function () {
-        Route::get('url', [GoogleController::class, 'getAuthUrl']);
-        Route::post('', [GoogleController::class, 'postLogin']);
-    });
+Route::group(['prefix' => 'google/login'], function () {
+    Route::get('url', [GoogleController::class, 'getAuthUrl']);
+    Route::post('', [GoogleController::class, 'postLogin']);
+});
 
-    Route::apiResource('products', ProductController::class)->only('index', 'show', 'store');
+Route::apiResource('products', ProductController::class)->only('index', 'show', 'store');
 
-    // Will be moved to auth
-    Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
+// Will be moved to auth
+Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
 
-    Route::group(['prefix' => 'auth'], function () {
-        Route::post('login', [AuthController::class, 'login'])->name('login');
-        Route::post('register', [AuthController::class, 'register'])->name('register');
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        Route::post('forgot-password', [AuthController::class, 'forgot_password']);
-        Route::post('change-password', [AuthController::class, 'change_password'])
-            ->middleware('auth:sanctum');
-    });
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('register', [AuthController::class, 'register'])->name('register');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('forgot-password', [AuthController::class, 'forgot_password']);
+    Route::post('change-password', [AuthController::class, 'change_password'])
+        ->middleware('auth:sanctum');
 });
