@@ -6,6 +6,7 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\AuthForgotPasswordRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -19,9 +20,15 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $request['password'] = Hash::make($request['password']);
-        $request['remember_token'] = Str::random(10);
-        $user = User::create($request->toArray());
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->username = $request->username;
+        $user->phone_number = $request->phoneNumber;
+        $user->password = Hash::make($request['password']);
+        $user->remember_token = Str::random(10);
+        $user->save();
+
         $token = $user->createToken('Laravel Password Grant Client')->plainTextToken;
         $response = ['token' => $token];
         return response($response, 200);
@@ -90,5 +97,10 @@ class AuthController extends Controller
             $arr = array("status" => 400, "message" => $msg, "data" => array());
         }
         return response()->json($arr);
+    }
+
+    public function user_data(Request $request)
+    {
+        return new UserResource($request->user());
     }
 }

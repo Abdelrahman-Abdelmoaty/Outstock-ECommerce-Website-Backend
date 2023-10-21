@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone_number',
+        'is_admin',
         'provider_id',
         'provider_name',
         'google_access_token_json',

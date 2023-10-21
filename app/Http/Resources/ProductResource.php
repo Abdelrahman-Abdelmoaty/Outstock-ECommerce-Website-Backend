@@ -21,8 +21,8 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'rating' => $this->rating,
             'images' => ImageResource::collection($this->whenLoaded('images')),
-            'category' => $this->relationLoaded('category') ? $this->category->name : null,
-            'color' => $this->relationLoaded('color') ? $this->category->name : null,
+            'category' => isset($this->category) ? $this->category->name : null,
+            'color' => isset($this->color) ? $this->color->name : null,
             'discounts' => DiscountResource::collection($this->whenLoaded('discounts'))
         ];
     }

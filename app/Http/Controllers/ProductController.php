@@ -36,13 +36,16 @@ class ProductController extends Controller
 
         $imagesList = [];
         $i = 0;
-        foreach ($request->images as $image) {
-            $newImg = new Image();
-            $imageName = "$i" . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('products'), $imageName);
-            $newImg['image_url'] = $imageName;
-            $imagesList[] = $newImg;
-            $i++;
+        if (isset($request->images)) {
+
+            foreach ($request->images as $image) {
+                $newImg = new Image();
+                $imageName = "$i" . time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('products'), $imageName);
+                $newImg['image_url'] = $imageName;
+                $imagesList[] = $newImg;
+                $i++;
+            }
         }
 
         $newProduct->images()->saveMany($imagesList);
