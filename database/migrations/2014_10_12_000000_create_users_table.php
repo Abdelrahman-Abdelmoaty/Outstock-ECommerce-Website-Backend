@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->nullable();
-            $table->boolean('isAdmin')->default(false);
+            $table->boolean('is_admin')->default(false);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->string('phone_number')->max(11)->min(11);
+            $table->string('phone_number')->max(11)->min(11)->nullable();
             $table->string('provider_name')->nullable();
             $table->string('provider_id')->nullable();
             $table->text('google_access_token_json')->nullable();

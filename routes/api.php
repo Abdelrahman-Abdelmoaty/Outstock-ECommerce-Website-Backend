@@ -41,3 +41,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('change-password', [AuthController::class, 'change_password'])
         ->middleware('auth:sanctum');
 });
+
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('auth/user-data', [AuthController::class, 'user_data']);
+});

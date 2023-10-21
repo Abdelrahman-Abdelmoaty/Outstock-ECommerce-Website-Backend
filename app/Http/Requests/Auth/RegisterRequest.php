@@ -26,6 +26,14 @@ class RegisterRequest extends FormRequest
             'email' => ['required_without:username', 'string', 'email', 'max:255', 'unique:users'],
             'username' => ['required_without:email', 'string', 'max:255',  'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phoneNumber' => ['required', 'min:11', 'max:11']
         ];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'phone_number' => $this->phoneNumber
+        ]);
     }
 }
