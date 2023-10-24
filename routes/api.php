@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ProductController;
@@ -25,10 +26,9 @@ Route::get('', function () {
 })->name('password.reset');
 
 
-Route::apiResource('products', ProductController::class)->only('index', 'show', 'store');
+Route::apiResource('products', ProductController::class)->only('index', 'show');
 
 // Will be moved to auth
-Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -44,13 +44,21 @@ Route::group(['prefix' => 'auth'], function () {
     });
 
     // Facebook Auth
-    Route::group(['prefix' => 'facebook'], function () {
-        Route::get('', [FacebookController::class, 'facebookRedirect']);
-        Route::get('callback', [FacebookController::class, 'loginWithFacebook']);
-    });
 });
+
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('auth/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('auth/user-data', [AuthController::class, 'user_data']);
+
+    Route::group(['middleware' => 'admin'], function () {
+        Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
+    });
+
+    Route::group(['prefix' => 'carts'], function () {
+        Route::get('my-cart', [CartController::class, 'myCart']);
+        Route::post('add-to-cart', [CartController::class, 'addToCart']);
+        Route::post('remove-from-cart', [CartController::class, 'removeFromCart']);
+        Route::post('', [CartController::class, 'setCart']);
+    });
 });
