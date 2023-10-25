@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller as Controller;
-
+use App\Models\Cart;
 use App\Models\User;
 
 /**
@@ -135,6 +135,7 @@ class GoogleController extends Controller
          * Log in and return token
          * HTTP 201
          */
+        Cart::userCartOrCreate($user->id);
         $token = $user->createToken("Google")->plainTextToken;
         return response()->json($token, 201);
     } // postLogin

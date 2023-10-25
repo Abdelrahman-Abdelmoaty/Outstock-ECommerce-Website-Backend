@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\AuthForgotPasswordRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Cart;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -29,6 +30,7 @@ class AuthController extends Controller
         $user->remember_token = Str::random(10);
         $user->save();
 
+        Cart::userCartOrCreate($user->id);
         $token = $user->createToken('Laravel Password Grant Client')->plainTextToken;
         $response = ['token' => $token];
         return response($response, 200);
@@ -56,8 +58,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $token = $request->user()->token();
-        $token->revoke();
+        $request->user()->currentAccessToken()->delete();
         $response = ['message' => 'You have been successfully logged out!'];
         return response($response, 200);
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FacebookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::group(['prefix' => 'auth/facebook'], function () {
+    Route::get('', [FacebookController::class, 'facebookRedirect']);
+    Route::get('callback', [FacebookController::class, 'loginWithFacebook']);
+});
 
 Route::get('/', function () {
     return view('welcome');
