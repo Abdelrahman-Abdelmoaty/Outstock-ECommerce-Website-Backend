@@ -137,7 +137,7 @@ class GoogleController extends Controller
          */
         Cart::userCartOrCreate($user->id);
         $token = $user->createToken("Google")->plainTextToken;
-        return response()->json($token, 201);
+        return response()->json(['token' => $token, 'user' => $user], 201);
     } // postLogin
 
     /**
