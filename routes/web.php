@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth/facebook'], function () {
     Route::get('', [FacebookController::class, 'facebookRedirect']);
-    Route::get('callback', [FacebookController::class, 'loginWithFacebook']);
+    // Route::get('callback', [FacebookController::class, 'loginWithFacebook']);
 });
 
 Route::get('/', function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -36,7 +37,7 @@ class FacebookController extends Controller
 
             Cart::userCartOrCreate($myUser->id);
             $token = $myUser->createToken("Facebook")->plainTextToken;
-            return response()->json($token, 201);
+            return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
         } catch (Exception $exception) {
             dd($exception->getMessage());
         }
