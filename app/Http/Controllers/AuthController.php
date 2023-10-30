@@ -32,6 +32,7 @@ class AuthController extends Controller
 
         Cart::userCartOrCreate($user->id);
         $token = $user->createToken('Laravel Password Grant Client')->plainTextToken;
+        $user = User::with('cart.products')->find($user->id);
         $response = ['token' => $token, 'user' => new UserResource($user)];
         return response($response, 200);
     }
@@ -47,6 +48,7 @@ class AuthController extends Controller
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Password Grant Client')->plainTextToken;
+                $user = User::with('cart.products')->find($user->id);
                 $response = ['token' => $token, 'user' => new UserResource($user)];
                 return response($response, 200);
             }
@@ -102,6 +104,7 @@ class AuthController extends Controller
 
     public function user_data(Request $request)
     {
-        return new UserResource($request->user());
+        $user = User::with('cart.products')->find($request->user()->id);
+        return new UserResource($user);
     }
 }

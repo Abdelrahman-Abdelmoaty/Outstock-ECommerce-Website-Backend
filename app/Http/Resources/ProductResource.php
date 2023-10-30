@@ -23,7 +23,12 @@ class ProductResource extends JsonResource
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'category' => isset($this->category) ? $this->category->name : null,
             'color' => isset($this->color) ? $this->color->name : null,
-            'discounts' => DiscountResource::collection($this->whenLoaded('discounts'))
+            'discounts' => DiscountResource::collection($this->whenLoaded('discounts')),
+
+            // If coming from cart
+            'count' => $this->whenPivotLoaded('cart_product', function () {
+                return $this->pivot->count;
+            }),
         ];
     }
 }
