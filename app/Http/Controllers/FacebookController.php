@@ -37,6 +37,7 @@ class FacebookController extends Controller
 
             Cart::userCartOrCreate($myUser->id);
             $token = $myUser->createToken("Facebook")->plainTextToken;
+            $myUser = User::with('cart.products')->find($myUser->id);
             return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
         } catch (Exception $exception) {
             dd($exception->getMessage());

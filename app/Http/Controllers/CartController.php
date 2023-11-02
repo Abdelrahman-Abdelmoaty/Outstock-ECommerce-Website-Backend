@@ -26,12 +26,7 @@ class CartController extends Controller
     public function addToCart(AddOrRemoveFromCartRequest $request)
     {
         $cart = Cart::userCartOrCreate($request->user()->id);
-        foreach ($request->products as $product) {
-            try {
-                $cart->products()->attach($product);
-            } catch (UniqueConstraintViolationException $e) {
-            }
-        }
+        $cart->attachProducts($request->products);
 
         return response()->json([], 200);
     }
@@ -59,7 +54,7 @@ class CartController extends Controller
         $cart->products()->detach($cart->products->pluck('id')->toArray());
 
         // Attach given products to the list
-        $cart->products()->attach($request->products);
+        $cart->attachProducts($request->products);
         return response()->json([], 200);
     }
 }

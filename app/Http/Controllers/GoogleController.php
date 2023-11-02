@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller as Controller;
+use App\Http\Resources\UserResource;
 use App\Models\Cart;
 use App\Models\User;
+use InvalidArgumentException;
 
 /**
  * Google Controller
@@ -96,7 +98,11 @@ class GoogleController extends Controller
         /**
          * Set the access token with google. nb json
          */
-        $client->setAccessToken(json_encode($accessToken));
+        try {
+            $client->setAccessToken(json_encode($accessToken));
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => "Invalid token"], 400);
+        }
 
         /**
          * Get user's data from google
@@ -114,14 +120,25 @@ class GoogleController extends Controller
         /**
          */
         if (!$user) {
-            $user = User::create([
-                'provider_id' => $userFromGoogle->id,
-                'provider_name' => 'google',
-                'google_access_token_json' => json_encode($accessToken),
-                'name' => $userFromGoogle->name,
-                'email' => $userFromGoogle->email,
-                //'avatar' => $providerUser->picture, // in case you have an avatar and want to use google's
-            ]);
+            // Checking if the a user with same email exists
+            $user = User::where('email', $userFromGoogle->email)->first();
+            if (isset($user)) {
+                $user->update([
+                    'provider_id' => $userFromGoogle->id,
+                    'provider_name' => 'google',
+                    'google_access_token_json' => json_encode($accessToken),
+                    'email' => $userFromGoogle->email,
+                ]);
+            } else {
+                $user = User::create([
+                    'provider_id' => $userFromGoogle->id,
+                    'provider_name' => 'google',
+                    'google_access_token_json' => json_encode($accessToken),
+                    'name' => $userFromGoogle->name,
+                    'email' => $userFromGoogle->email,
+                    //'avatar' => $providerUser->picture, // in case you have an avatar and want to use google's
+                ]);
+            }
         }
         /**
          * Save new access token for existing user
@@ -137,7 +154,8 @@ class GoogleController extends Controller
          */
         Cart::userCartOrCreate($user->id);
         $token = $user->createToken("Google")->plainTextToken;
-        return response()->json(['token' => $token, 'user' => $user], 201);
+        $user = User::with('cart.products')->find($user->id);
+        return response()->json(['token' => $token, 'user' => new UserResource($user)], 201);
     } // postLogin
 
     /**

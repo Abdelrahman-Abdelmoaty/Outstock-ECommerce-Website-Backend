@@ -24,7 +24,8 @@ class AddOrRemoveFromCartRequest extends FormRequest
         return [
             //
             'products' => ['required', 'array'],
-            'products.*' => ['integer', 'exists:products,id', 'distinct'],
+            'products.id' => ['integer', 'exists:products,id', 'distinct'],
+            'products.count' => ['integer', 'min:1'],
         ];
     }
 }

@@ -20,7 +20,8 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'phoneNumber' => $this->phone_number,
             'name' => $this->name,
-            'isAdmin' => (bool)$this->is_admin
+            'isAdmin' => (bool)$this->is_admin,
+            'cart' => $this->whenLoaded('cart')
         ];
     }
 }
