@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\UniqueConstraintViolationException;
 
 class Cart extends Model
 {
@@ -34,6 +33,9 @@ class Cart extends Model
         $syncData = [];
         foreach ($productList as $product) {
             $syncData[$product['id']] = ['count' => $product['count']];
+        }
+        foreach ($this->products as $oldProd) {
+            if (!isset($syncData[$oldProd->id])) $syncData[$oldProd->id] = ['count' => $oldProd->pivot->count];
         }
         $this->products()->sync($syncData);
     }
