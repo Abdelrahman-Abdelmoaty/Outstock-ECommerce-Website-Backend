@@ -5,6 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductTagController;
 use Google\Service\Connectors\AuthConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,7 @@ Route::get('', function () {
 
 
 Route::apiResource('products', ProductController::class)->only('index', 'show');
+Route::apiResource('tags', ProductTagController::class)->only('index', 'show');
 
 // Will be moved to auth
 
@@ -53,6 +55,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::group(['middleware' => 'admin'], function () {
         Route::apiResource('products', ProductController::class)->only('store', 'destroy',);
+        Route::apiResource('tags', ProductTagController::class)->only('store', 'destroy');
     });
 
     Route::group(['prefix' => 'carts'], function () {

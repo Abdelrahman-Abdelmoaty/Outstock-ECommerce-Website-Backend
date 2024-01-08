@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\UniqueConstraintViolationException;
 
 class Cart extends Model
 {
@@ -35,6 +34,6 @@ class Cart extends Model
         foreach ($productList as $product) {
             $syncData[$product['id']] = ['count' => $product['count']];
         }
-        $this->products()->sync($syncData);
+        $this->products()->syncWithoutDetaching($syncData);
     }
 }
