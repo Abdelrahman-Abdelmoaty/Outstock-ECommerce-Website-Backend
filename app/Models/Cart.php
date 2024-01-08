@@ -34,9 +34,6 @@ class Cart extends Model
         foreach ($productList as $product) {
             $syncData[$product['id']] = ['count' => $product['count']];
         }
-        foreach ($this->products as $oldProd) {
-            if (!isset($syncData[$oldProd->id])) $syncData[$oldProd->id] = ['count' => $oldProd->pivot->count];
-        }
-        $this->products()->sync($syncData);
+        $this->products()->syncWithoutDetaching($syncData);
     }
 }
