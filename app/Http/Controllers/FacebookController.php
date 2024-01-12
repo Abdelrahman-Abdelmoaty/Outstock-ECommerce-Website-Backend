@@ -19,35 +19,36 @@ class FacebookController extends Controller
 
     public function loginWithFacebook()
     {
-        // try {
+        try {
 
-        $user = Socialite::with('facebook')->stateless()->user();
-        $myUser = User::where([
-            ['provider_id', $user->id],
-            ['provider_name', 'facebook']
-        ])->first();
+            $user = Socialite::with('facebook')->stateless()->user();
+            $myUser = User::where([
+                ['provider_id', $user->id],
+                ['provider_name', 'facebook']
+            ])->first();
 
-        $userWithEmail = User::where([
-            ['email', $user->email]
-        ])->first();
+            //! Not Working
+            $userWithEmail = User::where([
+                ['email', $user->email]
+            ])->first();
 
-        if (!$myUser)
-            $myUser = User::create([
-                'name' => $user->name,
-                'email' => $user->email,
-                'provider_id' => $user->id,
-                'provider_name' => 'facebook',
-            ]);
-        else if (isset($userWithEmail)) {
-            $userWithEmail->provider_id = $user->id;
+            if (!$myUser)
+                $myUser = User::create([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'provider_id' => $user->id,
+                    'provider_name' => 'facebook',
+                ]);
+            else if (isset($userWithEmail)) {
+                $userWithEmail->provider_id = $user->id;
+            }
+
+            Cart::userCartOrCreate($myUser->id);
+            $token = $myUser->createToken("Facebook")->plainTextToken;
+            $myUser = User::with('cart.products')->find($myUser->id);
+            return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
+        } catch (Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 400);
         }
-
-        Cart::userCartOrCreate($myUser->id);
-        $token = $myUser->createToken("Facebook")->plainTextToken;
-        $myUser = User::with('cart.products')->find($myUser->id);
-        return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
-        // } catch (Exception $exception) {
-        //     return response()->json(['error' => $exception->getMessage()], 400);
-        // }
     }
 }
