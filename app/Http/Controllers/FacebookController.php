@@ -14,33 +14,40 @@ class FacebookController extends Controller
 {
     public function facebookRedirect()
     {
-        return Socialite::driver('facebook')->redirect();
+        return Socialite::with('facebook')->redirect();
     }
 
     public function loginWithFacebook()
     {
-        try {
+        // try {
 
-            $user = Socialite::driver('facebook')->user();
-            $myUser = User::where([
-                ['provider_id', $user->id],
-                ['provider_name', 'facebook']
-            ])->first();
+        $user = Socialite::with('facebook')->stateless()->user();
+        $myUser = User::where([
+            ['provider_id', $user->id],
+            ['provider_name', 'facebook']
+        ])->first();
 
-            if (!$myUser)
-                $myUser = User::create([
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'provider_id' => $user->id,
-                    'provider_name' => 'facebook',
-                ]);
+        $userWithEmail = User::where([
+            ['email', $user->email]
+        ])->first();
 
-            Cart::userCartOrCreate($myUser->id);
-            $token = $myUser->createToken("Facebook")->plainTextToken;
-            $myUser = User::with('cart.products')->find($myUser->id);
-            return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
-        } catch (Exception $exception) {
-            dd($exception->getMessage());
+        if (!$myUser)
+            $myUser = User::create([
+                'name' => $user->name,
+                'email' => $user->email,
+                'provider_id' => $user->id,
+                'provider_name' => 'facebook',
+            ]);
+        else if (isset($userWithEmail)) {
+            $userWithEmail->provider_id = $user->id;
         }
+
+        Cart::userCartOrCreate($myUser->id);
+        $token = $myUser->createToken("Facebook")->plainTextToken;
+        $myUser = User::with('cart.products')->find($myUser->id);
+        return response()->json(['token' => $token, 'user' => new UserResource($myUser)], 201);
+        // } catch (Exception $exception) {
+        //     return response()->json(['error' => $exception->getMessage()], 400);
+        // }
     }
 }
